@@ -24,15 +24,17 @@ export const JourneyPicker = ({ onJourneyChange }) => {
   const handleSubmit = (event) => {
     event.preventDefault()
 
-    console.log('Odesílám formulář s cestou')
-    console.log(fromCity,toCity,date)
+   fetch(
+      `https://apps.kodim.cz/daweb/leviexpress/api/journey?fromCity=${fromCity}&toCity=${toCity}&date=${date}`)
+      .then((response) => response.json())
+      .then((data) => onJourneyChange(data.results))
   }
 
   const CityOptions = ({cities}) => {
     return (
       <>
       <option value="">Vyberte</option>
-      {cities.map((city) => <option value={city.name} key={city.code}>{city.name}</option>)}
+      {cities.map((city) => <option value={city.code} key={city.code}>{city.name}</option>)}
       </>
     )
   }
@@ -41,17 +43,19 @@ export const JourneyPicker = ({ onJourneyChange }) => {
     return (
       <>
       <option value="">Vyberte</option>
-      {dates.map((data) => <option value={data.dateCs} key={data.dateBasic}>{data.dateCs}</option>)}
+      {dates.map((data) => <option value={data.dateBasic} key={data.dateBasic}>{data.dateCs}</option>)}
       </>
     )
   }
   
+  const submitDisable = fromCity === '' || toCity === '' || date === ''
+
   return (
 
   <div className="journey-picker container">
     <h2 className="journey-picker__head">Kam chcete jet?</h2>
     <div className="journey-picker__body">
-      <form className="journey-picker__form" onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit} className="journey-picker__form">
         <label>
           <div className="journey-picker__label">Odkud:</div>
           <select value={fromCity} onChange={(e) => setFromCity(e.target.value)}>
@@ -72,6 +76,7 @@ export const JourneyPicker = ({ onJourneyChange }) => {
         </label>
         <div className="journey-picker__controls">
           <button 
+           disabled={submitDisable}
             className="btn" 
             type="submit"
           > 
